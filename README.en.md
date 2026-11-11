@@ -7,7 +7,8 @@
 <div align="center">
   <strong>Next-generation WYSIWYG markdown editor</strong><br>
   A simple, elegant, distraction-free markdown editor built on Electron + Vue 3 —<br>
-  now with <b>smarter LaTeX handling</b> and <b>anydoc-powered document import</b>.
+  tuned for engineering and academic writing: paste-ready math, numbered equations,<br>
+  and document import that keeps tables <em>and</em> images.
 </div>
 
 <br>
@@ -16,7 +17,9 @@
   <img src="https://img.shields.io/static/v1?label=Platform&message=Linux%20%7C%20macOS%20%7C%20Windows&color=lightgrey" alt="platform">
   <img src="https://img.shields.io/github/license/jeokeo011222/marktext" alt="license">
   <img src="https://img.shields.io/badge/paste--LaTeX--auto--normalize-2ea44f" alt="tex-normalize">
+  <img src="https://img.shields.io/badge/KaTeX--paper--compat-ff69b4" alt="katex-compat">
   <img src="https://img.shields.io/badge/anydoc--Office%2FPDF--import-2ea44f" alt="anydoc-import">
+  <img src="https://img.shields.io/badge/embedded--images--restored-orange" alt="image-restore">
   <img src="https://img.shields.io/badge/maintained-independently-blue" alt="maintained">
   <img src="https://img.shields.io/badge/upstream-marktext%2Fmarktext-blueviolet" alt="upstream">
 </div>
@@ -24,25 +27,20 @@
 <br>
 
 <div align="center">
-  <a href="https://marktext.me">Website</a> ·
+  <a href="https://github.com/jeokeo011222/marktext#readme">Project home</a> ·
   <a href="#-highlights-of-this-fork">Highlights</a> ·
   <a href="#-features">Features</a> ·
   <a href="#-download--install">Download</a> ·
-  <a href="#%EF%B8%8F-development">Development</a>
+  <a href="#%EF%B8%8F-development">Development</a> ·
+  <a href="README.md">中文</a>
 </div>
 
 <br>
 
 > [!NOTE]
-> **🧪 这是一个独立维护的 fork（Independently maintained fork）。**
-> 本仓库基于上游 [`marktext/marktext`](https://github.com/marktext/marktext) 的 `develop` 分支发展，**不向上游提交 PR**，独立维护以下两项增强。如果你只想用原版，请前往上游仓库下载官方构建。
+> **This is an independently maintained fork** of [`marktext/marktext`](https://github.com/marktext/marktext), based on its `develop` branch. It does **not** open PRs back upstream. On top of the untouched original feature set it carries **six enhancements**: auto-normalized LaTeX on paste, anydoc document import, embedded-image extraction on import, visible import-failure feedback, a paper-grade KaTeX compatibility layer, and single-backslash math delimiters enabled by default. If you only need the original, download the official upstream build.
 >
-> **This is an independent fork.** It is maintained separately from upstream and will **not** open PRs back to `marktext/marktext`. Two enhancements are carried as a local patch set (see [Relationship to upstream](#-relationship-to-upstream)).
->
-> | 增强 Enhancement | 解决的问题 Problem it solves |
-> | --- | --- |
-> | 📐 **粘贴即归一化 LaTeX 定界符** | 从大模型对话 / JSON / 日志复制的公式常带二次转义（`\\(` `\\]` `\_`），原样粘贴会显示为源码 |
-> | 📄 **anydoc 导入 Office / PDF** | 原导入仅支持 pandoc 的少数格式，PPT / Excel / PDF / RTF 无法导入 |
+> 中文：这是独立维护的分支，不向上游提交 PR；原版功能完整保留，另叠加六项增强。详见 [README.md](README.md)。
 
 ---
 
@@ -55,6 +53,7 @@
 - [🛠️ Development](#️-development)
 - [🔗 Relationship to upstream](#-relationship-to-upstream)
 - [📜 License](#-license)
+- [🙏 Credits & links](#-credits--links)
 
 ---
 
@@ -63,7 +62,7 @@
 ### 1. 📐 Paste LaTeX from anywhere — auto-normalized
 
 Text copied from chat UIs, JSON payloads or log output often arrives escaped one
-time too many: the delimiters come as `\( ... \)` / `\[ ... \]` and the math body
+time too many: the delimiters come as `\\( ... \\)` / `\\[ ... \\]` and the math body
 keeps escaped underscores. Neither form is a delimiter the editor parses, so the
 paste lands as literal source text instead of rendered math.
 
@@ -73,10 +72,6 @@ HTML clipboard copy so the raw delimiters are not pasted back over the normalize
 Markdown. Bodies without the escaping signature stay untouched, so a plain `\\`
 line break in a matrix survives, as do escaped literal brackets in prose and any
 content inside fenced or inline code.
-
-> 中文：从大模型、JSON、日志里粘出来的公式常是二次转义形态（`\\(f\_\theta\\)`），粘贴后变成源码。**本 fork 在粘贴瞬间自动还原为标准 `$f_\theta$`**，无需手动改。代码块与行内代码内的内容不会被误改。
-
-Before / after:
 
 ```diff
 - 设模型为 \\(f\_\theta\\)，其计算结构为 \\[ G_T=(V_T,E_T,W_T) \\]
@@ -105,23 +100,76 @@ parser that keeps tables, headings and structure intact:
 anydoc is a napi binding loaded lazily; a host without the platform binary
 gracefully falls back to pandoc instead of failing to boot.
 
-> 中文：原「导入」只支持 pandoc 能读的少数格式，**PPT / Excel / PDF / RTF 根本导不进来**。本 fork 新增 anydoc 通路，`File → Import` 现在支持上述全部格式，表格与标题结构完整保留。
+### 3. 🖼️ Bring embedded images along on import
+
+`toMarkdown()` only returns text, so every picture inside a `.docx`/`.pptx` used to
+be silently dropped — all that remained was an alt string. This fork also reads
+anydoc's document model (`toDocument()`), writes each asset into an `assets/`
+folder next to the source file, and reinserts `![...](...)` near the image's
+original position using the surrounding text as an anchor. Unmatched images are
+never discarded: they are listed under an **"Imported images"** appendix.
+
+A notification reports how many images were extracted, how many were placed back,
+how many were appended, and where the files landed. Formats without a document
+model (notably PDF) still import as plain text — they simply do not fail.
+
+### 4. 🔔 Import failures are visible and actionable
+
+A scanned PDF raising `needsOcr`, an encrypted document, an unsupported format,
+a malformed package, a resource limit, an unreadable file or a hosted-conversion
+error used to produce nothing but a line in the log. The failure code is now
+translated into an in-app notification with a concrete remedy — e.g. *"This PDF has
+scanned pages; anydoc does not do OCR, run OCR on those pages first"*. Messages are
+localized across all 13 UI languages.
+
+### 5. 🧮 Paper-grade KaTeX compatibility (no engine swap)
+
+KaTeX renders one formula at a time and knows nothing about LaTeX document state.
+Instead of replacing it with MathJax — slower live rendering, and KaTeX is already
+inlined into the renderer bundle — a compatibility pass rewrites those constructs
+into KaTeX equivalents before rendering:
+
+| Construct | Handling |
+| :--- | :--- |
+| `\label{}` / `\ref{}` / `\eqref{}` | Document-wide numbering registry, rewritten to `\tag` and literal numbers; unresolved references render as `??` and resolve on the next render, matching LaTeX's two-pass behaviour |
+| `\newcommand` / `\renewcommand` / `\providecommand` / `\def` | Extracted into KaTeX `macros`, with balanced-brace macro bodies |
+| `\tag{}` | Custom numbers are kept and do not consume the counter |
+| `\nonumber` / `\notag` / `\numberwithin` / `\allowdisplaybreaks` | Document-level commands with no meaning in a single formula are stripped |
+
+Numbering is reset per document, so labels never leak between tabs. Display
+formulas with a `\label` are numbered by default; an *auto-number all* option is
+available. `align` / `gather` / `equation` environments and `\ce{}` are already
+native to KaTeX + mhchem and are deliberately left alone.
+
+### 6. ⌨️ Single-backslash math delimiters on by default
+
+The `texMathSingleBackslash` preference existed upstream but defaulted to `false`,
+so `\(...\)` / `\[...\]` from LaTeX sources and chat tools showed up as raw text.
+The default is now `true`, with a **one-time migration** for existing
+`preferences.json` files (a marker is written, so a user who turns the option off
+keeps that choice on every restart). The preference label is marked *recommended*
+in all 13 languages.
+
+> All six enhancements are carried as small, reviewable patches with unit tests —
+> mainly in `packages/muya/src/clipboard/`, `packages/muya/src/utils/katexCompat.ts`,
+> `packages/desktop/src/main/utils/anydoc.ts` and
+> `packages/desktop/src/main/menu/actions/file.ts`.
 
 ---
 
 ## 🎯 Features
 
 - 📝 **Real-time WYSIWYG preview** with a clean, distraction-free interface.
-- 📐 **Math expressions** rendered with KaTeX, plus front matter and emoji support.
-- 📊 **Diagrams** via Mermaid and PlantUML.
+- 📐 **Math expressions** rendered with KaTeX, `$…$` / `$$…$$` / `\(…\)` / `\[…\]`, equation numbering, cross-references, macros and mhchem.
+- 📊 **Diagrams** via Mermaid 12, PlantUML, Vega-Lite, flowchart and sequence.
 - 📑 **Outline / table of contents** for long documents.
 - 🌗 **Multiple editing modes**: Source Code, Typewriter and Focus mode.
 - 🎨 **Various themes**: Cadmium Light, Material Dark and more.
-- 🖼️ **Paste images** directly from the clipboard.
-- 📤 **Export** to HTML and PDF.
+- 🖼️ **Paste images** directly from the clipboard; embedded images are restored on import.
+- 📤 **Export** to HTML, PDF and pandoc formats.
 - ✅ **CommonMark + GitHub Flavored Markdown** conformance.
 - ⌨️ Paragraph and inline-style shortcuts to speed up writing.
-- 📐📄 **(fork) Auto-normalized LaTeX on paste** and **anydoc document import** — see [Highlights](#-highlights-of-this-fork).
+- 📐📄 **(fork)** The six enhancements above — see [Highlights](#-highlights-of-this-fork).
 
 ---
 
@@ -133,11 +181,12 @@ gracefully falls back to pandoc instead of failing to boot.
 
 ## 📥 Download & Install
 
-The two enhancements above are **not yet published as official installers**. You have two options:
+The fork enhancements are **not yet published as official installers**. You have two options:
 
 1. **Use the upstream release** for a stable, signed build — just without the fork enhancements:
    👉 <https://github.com/marktext/marktext/releases/latest>
-2. **Build this fork from source** to get the LaTeX + anydoc features (see [Development](#️-development)).
+2. **Build this fork from source** to get all six enhancements (see [Development](#️-development)).
+   This fork's own release page: <https://github.com/jeokeo011222/marktext/releases>
 
 Requires **Windows 10/11, macOS 13+ or a modern Linux** distribution.
 
@@ -165,7 +214,8 @@ pnpm run build:linux   # Linux — AppImage, snap, deb, rpm, tar.gz
 
 > ⚠️ On Windows, native modules (`ced`, `native-keymap`, …) are compiled with
 > `node-gyp` and need the **VS 2022 (or newer) C++ build tools**. If `pnpm install`
-> skips native compilation, run `pnpm rebuild` afterwards.
+> skips native compilation, run `pnpm rebuild` afterwards. anydoc ships a platform
+> binary, so keep the `asarUnpack` entry intact when packaging.
 
 Tests & checks:
 
@@ -183,7 +233,7 @@ pnpm run typecheck     # vue-tsc --noEmit
 - This repository is a **fork** of [`marktext/marktext`](https://github.com/marktext/marktext),
   tracking its `develop` branch as the base.
 - It is **maintained independently** and does **not** open pull requests back to upstream.
-- The two enhancements are carried as a small, reviewable **patch set** on top of the
+- The six enhancements are carried as a small, reviewable **patch set** on top of the
   base. To bring in upstream changes later:
 
   ```bash
@@ -193,10 +243,33 @@ pnpm run typecheck     # vue-tsc --noEmit
   ```
 
 - All credit for the editor engine, UI and ecosystem goes to the MarkText authors
-  and contributors. This fork only adds the two focused enhancements described above.
+  and contributors. This fork only adds the six focused enhancements described above.
 
 ---
 
 ## 📜 License
 
 Released under the **MIT License** — same as upstream. See [LICENSE](LICENSE).
+
+---
+
+## 🙏 Credits & links
+
+Almost everything here is the work of **[marktext/marktext](https://github.com/marktext/marktext)** —
+our thanks to [**Jocs**](https://github.com/Jocs), the
+[contributors](https://github.com/marktext/marktext/graphs/contributors), and the
+community behind Muya, the themes, the translations and the cross-platform build
+chain. Thanks also to KaTeX, Mermaid, PlantUML, Vega-Lite, pandoc, anydoc,
+Electron and Vue. **All credit belongs to the original project; any defects in
+this fork are ours.**
+
+| | |
+| :--- | :--- |
+| This fork · README | <https://github.com/jeokeo011222/marktext#readme> |
+| This fork · releases | <https://github.com/jeokeo011222/marktext/releases> |
+| This fork · issues | <https://github.com/jeokeo011222/marktext/issues> |
+| Original repository | <https://github.com/marktext/marktext> |
+| Official website | <https://marktext.me> |
+| Support the original | <https://github.com/sponsors/marktext> |
+
+If MarkText makes your writing easier, please consider supporting the original project. ❤️
