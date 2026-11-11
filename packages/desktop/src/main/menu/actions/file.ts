@@ -26,6 +26,7 @@ import { normalizeAndResolvePath, resolveLocalLinkTarget, writeFile } from '../.
 
 import { documentWrites } from '../../filesystem/documentWrites'
 import { getPath } from '../../utils'
+import { ANYDOC_EXTENSIONS, anydocAvailable, convertWithAnydoc, isAnyDocFile } from '../../utils/anydoc'
 import pandoc, {
   PANDOC_EXPORT_FORMATS,
   formatLinksMedia,
@@ -293,9 +294,18 @@ const noticePandocNotFound = (win: BrowserWindow, titleKey = 'dialog.importWarni
   })
 }
 
-const openPandocFile = async(windowId: number, pathname: string): Promise<void> => {
+// anydoc reads the Office/PDF formats pandoc either cannot open or flattens;
+// everything else in the import list still goes through pandoc.
+const convertToMarkdown = async(pathname: string): Promise<string> => {
+  if (isAnyDocFile(pathname) && (await anydocAvailable())) {
+    return convertWithAnydoc(pathname)
+  }
+  return pandoc(pathname, 'markdown')
+}
+
+const openConvertedFile = async(windowId: number, pathname: string): Promise<void> => {
   try {
-    const data = await pandoc(pathname, 'markdown')
+    const data = await convertToMarkdown(pathname)
     ipcMain.emit('app-open-markdown-by-id', windowId, data)
   } catch (err) {
     log.error('Error while converting file:', err)
@@ -323,12 +333,12 @@ ipcMain.on('mt::window::drop', async(e, fileList: string[]) => {
       continue
     }
 
-    if (PANDOC_EXTENSIONS.some((ext: string) => file.endsWith(ext))) {
-      const existsPandoc = await pandoc.exists()
-      if (!existsPandoc) {
+    if (PANDOC_EXTENSIONS.some((ext: string) => file.endsWith(ext)) || isAnyDocFile(file)) {
+      // anydoc ships with the app, so only the pandoc half needs the binary there.
+      if (!isAnyDocFile(file) && !(await pandoc.exists())) {
         noticePandocNotFound(win)
       } else {
-        openPandocFile(win.id, file)
+        openConvertedFile(win.id, file)
       }
       break
     }
@@ -470,26 +480,28 @@ export const importFile = async(win: BrowserWindow | null): Promise<void> => {
   if (!win) {
     return
   }
-  const existsPandoc = await pandoc.exists()
-
-  if (!existsPandoc) {
-    noticePandocNotFound(win)
-    return
-  }
 
   const { filePaths } = await dialog.showOpenDialog(win, {
     properties: ['openFile'],
     filters: [
       {
         name: 'All Files',
-        extensions: [...PANDOC_EXTENSIONS]
+        extensions: [...new Set([...ANYDOC_EXTENSIONS, ...PANDOC_EXTENSIONS])]
       }
     ]
   })
 
-  if (filePaths && filePaths[0]) {
-    openPandocFile(win.id, filePaths[0])
+  const file = filePaths?.[0]
+  if (!file) {
+    return
   }
+
+  if (!isAnyDocFile(file) && !(await pandoc.exists())) {
+    noticePandocNotFound(win)
+    return
+  }
+
+  openConvertedFile(win.id, file)
 }
 
 export const printDocument = (win: Win): void => {

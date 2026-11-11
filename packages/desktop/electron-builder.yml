@@ -79,6 +79,8 @@ electronFuses:
 
 asarUnpack:
   - resources/**
+  # anydoc is a napi binding: the .node file cannot be loaded from inside asar.
+  - node_modules/@firecrawl/anydoc-*/**
 fileAssociations:
   - ext: md
     name: Markdown
