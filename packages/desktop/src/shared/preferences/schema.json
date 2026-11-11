@@ -308,9 +308,9 @@
     "default": false
   },
   "texMathSingleBackslash": {
-    "description": "Markdown-Enable pandoc's markdown extension tex_math_single_backslash.",
+    "description": "Markdown-Enable pandoc's markdown extension tex_math_single_backslash. On by default: \\(...\\) and \\[...\\] are the delimiters most LaTeX and chat sources emit.",
     "type": "boolean",
-    "default": false
+    "default": true
   },
   "texMathDoubleBackslash": {
     "description": "Markdown-Enable pandoc's markdown extension tex_math_double_backslash.",

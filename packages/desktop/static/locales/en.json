@@ -643,7 +643,7 @@
         "footnote": "Footnote",
         "texMathDollars": "TeX math with $ and $$",
         "texMathGfm": "GitHub TeX math ($`…`$ and ```math)",
-        "texMathSingleBackslash": "TeX math with single-backslash delimiters",
+        "texMathSingleBackslash": "TeX math with single-backslash delimiters (recommended: \\(...\\) and \\[...\\])",
         "texMathDoubleBackslash": "TeX math with double-backslash delimiters",
         "fancyLists": "Letter and Roman numeral lists",
         "highlightSyntax": "Highlight (==text==)",
@@ -777,7 +777,7 @@
     }
   },
   "about": {
-    "copyright": "Copyright © Luo Ran 2017-{year}",
+    "copyright": "Copyright © Quantum Eye 2017-{year}",
     "copyrightContributors": "Made with <3 by Github Contributors"
   },
   "commands": {
@@ -938,6 +938,18 @@
     "file": "File",
     "fileExists": "File exists {filename}",
     "files": "Files",
+    "importFailed": "Import failed",
+    "importFailureGeneric": "Could not import {filename}: {reason}",
+    "importNeedsOcr": "This PDF has scanned pages ({pages} of {pageCount}) and anydoc does not do OCR. Run OCR on those pages first, or use another converter.",
+    "importEncrypted": "The document is encrypted or password protected. Remove the protection first.",
+    "importUnsupported": "anydoc cannot parse this format. Convert it to DOCX or PDF with another tool first.",
+    "importMalformed": "The document is structurally damaged or has no extractable content.",
+    "importResourceLimit": "The document exceeds an anydoc safety limit (size or nesting depth).",
+    "importIo": "The file could not be read. Check the path and its permissions.",
+    "importHosted": "Hosted OCR conversion failed. Retry later or use a local OCR tool.",
+    "importAssetsSaved": "Extracted {count} images into {directory}; {placed} were put back near their original position and {appended} were appended at the end.",
+    "importedImagesTitle": "Images imported",
+    "importedImagesAppendix": "Imported images",
     "importWarning": "Import warning",
     "installPandoc": "Pandoc was not found. Install it, or set the MARKTEXT_PANDOC environment variable to the pandoc binary and restart MarkText.",
     "exportWarning": "Export warning",

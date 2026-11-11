@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/jeokeo011222/marktext/develop/docs/assets/logo-small.png" alt="MarkText" width="110" height="110">
-</p>
+
 
 <h1 align="center">MarkText · 增强版</h1>
 
@@ -33,52 +31,28 @@
   <a href="README.en.md">English</a>
 </div>
 
-<br>
 
-> [!NOTE]
-> **关于本仓库**：这是 [`marktext/marktext`](https://github.com/marktext/marktext) 的**独立维护分支**，不向上游提交 PR。原版功能完整保留，另新增两项能力：**粘贴时自动归一化 LaTeX 公式定界符**、**用 anydoc 导入 Office / PDF 文档**。若只需原版，请前往上游下载官方构建。
 
----
 
-## 📑 目录
-
-- [🎯 功能一览](#overview)
-- [📝 写作与编辑](#editing)
-- [🧩 Markdown 语法与扩展](#syntax)
-- [📊 图表与可视化](#diagrams)
-- [🖼️ 图片与媒体](#images)
-- [🎨 主题与外观](#themes)
-- [📤 导入与导出](#io)
-- [🚀 本分支新增的两项能力](#fork-extras)
-- [🖼️ 截图](#screenshot)
-- [📥 下载与安装](#install)
-- [🛠️ 从源码构建](#build)
-- [🔗 与上游的关系](#upstream)
-- [📜 开源许可](#license)
-- [🙏 致谢原版](#thanks)
-
----
-
-<a id="overview"></a>
 
 ## 🎯 功能一览
 
-| 领域 | 你能做什么 |
-| :--- | :--- |
-| **写作与编辑** | 实时所见即所得预览、三种编辑模式、快速插入、行转换、表格工具、查找替换、文档统计、拼写检查 |
+| 领域              | 你能做什么                                                                                  |
+|:----------------- |:------------------------------------------------------------------------------------------- |
+| **写作与编辑**    | 实时所见即所得预览、三种编辑模式、快速插入、行转换、表格工具、查找替换、文档统计、拼写检查  |
 | **Markdown 语法** | CommonMark + GFM + Pandoc 扩展，数学公式、脚注、任务列表、表格、GitHub Alerts、Front Matter |
-| **图表与可视化** | Mermaid、PlantUML、Vega-Lite、flowchart、sequence，可放大、导出 SVG/PNG |
-| **图片与媒体** | 剪贴板直接粘贴、图床上传、自动归集到相对资源目录、媒体查看器 |
-| **主题与外观** | 多套亮色/暗色主题、跟随系统、自定义主题、导出专用主题 |
-| **导入与导出** | 导出 HTML / PDF / 打印及 pandoc 多格式；导入 Office、PDF、RTF、EPUB、CSV 等 |
-| **效率与工程** | 多标签页、目录树、阅读模式、快捷键体系、命令行启动、便携版、可编辑偏好文件 |
-| **本分支增强** | 粘贴公式自动归一化、anydoc 全格式文档导入 |
+| **图表与可视化**  | Mermaid、PlantUML、Vega-Lite、flowchart、sequence，可放大、导出 SVG/PNG                     |
+| **图片与媒体**    | 剪贴板直接粘贴、图床上传、自动归集到相对资源目录、媒体查看器                                |
+| **主题与外观**    | 多套亮色/暗色主题、跟随系统、自定义主题、导出专用主题                                       |
+| **导入与导出**    | 导出 HTML / PDF / 打印及 pandoc 多格式；导入 Office、PDF、RTF、EPUB、CSV 等                 |
+| **效率与工程**    | 多标签页、目录树、阅读模式、快捷键体系、命令行启动、便携版、可编辑偏好文件                  |
+| **本分支增强**    | 粘贴公式自动归一化、anydoc 全格式文档导入                                                   |
 
 一句话概括：**输入即排版，公式即渲染，文档即导入。**
 
 ---
 
-<a id="editing"></a>
+
 
 ## 📝 写作与编辑
 
@@ -95,18 +69,16 @@
 - **多文件工作区**：多标签页、单窗口打开多个目录、目录树中移动文件与文件夹。
 - **效率设施**：完整的跨平台快捷键体系、命令行（CLI）启动与只读打开、便携版（Portable）支持；偏好设置可在图形界面调整，也可直接编辑 `preferences.json`。
 
----
 
-<a id="syntax"></a>
 
 ## 🧩 Markdown 语法与扩展
 
-| 规范 / 扩展 | 支持内容 |
-| :--- | :--- |
-| **CommonMark** | 标题、段落、换行、分隔线、强调、链接、图片、引用、列表、花式列表、代码块、原始 HTML、反斜杠转义 |
-| **GitHub Flavored Markdown** | 删除线、任务列表（Todo List）、表格、扩展自动链接 |
-| **Pandoc 扩展** | 脚注、上标与下标、**数学公式** |
-| **其他约定** | GitHub Alerts（`> [!NOTE]` 等）、高亮 `==text==`、行内 diff、多行引用、键盘按键、Emoji 短码、Front Matter、命名锚点 |
+| 规范 / 扩展                  | 支持内容                                                                                                            |
+|:---------------------------- |:------------------------------------------------------------------------------------------------------------------- |
+| **CommonMark**               | 标题、段落、换行、分隔线、强调、链接、图片、引用、列表、花式列表、代码块、原始 HTML、反斜杠转义                     |
+| **GitHub Flavored Markdown** | 删除线、任务列表（Todo List）、表格、扩展自动链接                                                                   |
+| **Pandoc 扩展**              | 脚注、上标与下标、**数学公式**                                                                                      |
+| **其他约定**                 | GitHub Alerts（`> [!NOTE]` 等）、高亮 `==text==`、行内 diff、多行引用、键盘按键、Emoji 短码、Front Matter、命名锚点 |
 
 - **数学公式**：由 KaTeX 渲染，行内 `$...$` 与块级 `$$...$$` 均支持，导出 HTML/PDF 时一并保留。
 - **代码高亮**：围栏代码块标注语言（如 ` ```js `）即自动着色。
@@ -114,7 +86,7 @@
 
 ---
 
-<a id="diagrams"></a>
+
 
 ## 📊 图表与可视化
 
@@ -122,9 +94,7 @@
 
 鼠标悬停已渲染的图表会出现工具栏：可放大查看，也可**另存为 SVG、另存为 PNG，或直接复制为图片**粘贴到聊天窗口与幻灯片，无需导出整篇文档。本地渲染的图表 PNG 导出使用编辑器背景色。
 
----
 
-<a id="images"></a>
 
 ## 🖼️ 图片与媒体
 
@@ -136,7 +106,7 @@
 
 ---
 
-<a id="themes"></a>
+
 
 ## 🎨 主题与外观
 
@@ -144,7 +114,7 @@
 
 ---
 
-<a id="io"></a>
+
 
 ## 📤 导入与导出
 
@@ -157,19 +127,19 @@
 
 **导入**（`文件 → 导入`）
 
-| 走 anydoc（本分支新增） | 仍走 pandoc |
-| :--- | :--- |
-| doc / docx / docm | html |
-| ppt / pptx / pps | latex / rst / org |
-| xls / xlsx | wiki / opml / textile |
-| odt / ods / odp | |
-| rtf · epub · csv · **pdf** | |
+| 走 anydoc（本分支新增）    | 仍走 pandoc           |
+|:-------------------------- |:--------------------- |
+| doc / docx / docm          | html                  |
+| ppt / pptx / pps           | latex / rst / org     |
+| xls / xlsx                 | wiki / opml / textile |
+| odt / ods / odp            |                       |
+| rtf · epub · csv · **pdf** |                       |
 
 anydoc 是 Rust 实现的文档解析器，转换时**保留表格、标题层级与文档结构**；以惰性方式加载，缺少平台二进制时自动回退到 pandoc，不会导致程序无法启动。
 
 ---
 
-<a id="fork-extras"></a>
+
 
 ## 🚀 本分支新增的两项能力
 
@@ -193,30 +163,15 @@ anydoc 是 Rust 实现的文档解析器，转换时**保留表格、标题层�
 
 ---
 
-<a id="screenshot"></a>
-
 ## 🖼️ 截图
 
 ![MarkText 界面](https://raw.githubusercontent.com/jeokeo011222/marktext/develop/docs/assets/marktext.png?raw=true)
 
----
 
-<a id="install"></a>
-
-## 📥 下载与安装
-
-本分支的两项增强**尚未发布官方安装包**，有两种使用方式：
-
-1. **使用上游官方构建**（稳定、已签名，但不含本分支增强）：<https://github.com/marktext/marktext/releases/latest>
-2. **从源码构建本分支**以获得公式归一化与 anydoc 导入能力，见下节。
-
-系统要求：**Windows 10/11**、**macOS 13+** 或现代 Linux 发行版；x64 与 arm64 均可。
 
 ---
 
-<a id="build"></a>
-
-## 🛠️ 从源码构建
+ 🛠️ 从源码构建
 
 项目为 pnpm workspace，以下命令均在仓库根目录执行：
 
@@ -240,25 +195,7 @@ pnpm run typecheck     # vue-tsc --noEmit
 
 > ⚠️ Windows 上 `ced`、`native-keymap` 等原生模块需 node-gyp 编译，依赖 **VS 2022 及以上 C++ 生成工具**。若安装时跳过了原生编译，补跑 `pnpm rebuild` 即可。
 
----
-
-<a id="upstream"></a>
-
-## 🔗 与上游的关系
-
-- 本仓库 fork 自 [`marktext/marktext`](https://github.com/marktext/marktext)，以其 `develop` 分支为基线。
-- **独立维护，不向上游提交 PR**；上游的功能更新由我们自行合并。
-- 两项增强以可审阅的小补丁叠加在基线之上，跟进上游时可重放：
-
-  ```bash
-  git remote add upstream https://github.com/marktext/marktext.git
-  git fetch upstream
-  git rebase upstream/develop
-  ```
-
----
-
-<a id="license"></a>
+~~~~
 
 ## 📜 开源许可
 
@@ -266,7 +203,7 @@ pnpm run typecheck     # vue-tsc --noEmit
 
 ---
 
-<a id="thanks"></a>
+
 
 ## 🙏 致谢原版
 
@@ -276,13 +213,4 @@ pnpm run typecheck     # vue-tsc --noEmit
 
 也一并感谢 **KaTeX、Mermaid、PlantUML、Vega-Lite、pandoc、anydoc、Electron、Vue** 等上游开源项目，以及为 MarkText 提供[赞助](https://github.com/sponsors/marktext)的个人与机构。
 
-本分支所做的，不过是在这座已经建得很完整的房子里加了两盏灯：粘贴时自动把公式定界符摆正，以及把 Office / PDF 文档请进门。**所有功劳归于原版作者与社区；本分支若有任何问题，责任在我们。**
-
-| | |
-| :--- | :--- |
-| 原版仓库 | <https://github.com/marktext/marktext> |
-| 官方网站 | <https://marktext.me> |
-| 用户文档 | <https://marktext.me/docs/introduction> |
-| 支持原版 | <https://github.com/sponsors/marktext> |
-
-如果 MarkText 让你的写作更顺手，请优先考虑支持原版项目。❤️
+本分支所做的，不过是在这座已经建得很完整的房子里加了两盏灯：粘贴时自动把公式定界符摆正，以及把 Office / PDF 文档请进门。**所有功劳归于原版作者与社区；本分支若有任何问题，责任在我们。

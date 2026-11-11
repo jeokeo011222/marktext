@@ -27,6 +27,7 @@ import { normalizeAndResolvePath, resolveLocalLinkTarget, writeFile } from '../.
 import { documentWrites } from '../../filesystem/documentWrites'
 import { getPath } from '../../utils'
 import { ANYDOC_EXTENSIONS, anydocAvailable, convertWithAnydoc, isAnyDocFile } from '../../utils/anydoc'
+import type { AnyDocConversion } from '../../utils/anydoc'
 import pandoc, {
   PANDOC_EXPORT_FORMATS,
   formatLinksMedia,
@@ -296,19 +297,85 @@ const noticePandocNotFound = (win: BrowserWindow, titleKey = 'dialog.importWarni
 
 // anydoc reads the Office/PDF formats pandoc either cannot open or flattens;
 // everything else in the import list still goes through pandoc.
-const convertToMarkdown = async(pathname: string): Promise<string> => {
+const convertToMarkdown = async(pathname: string): Promise<string | AnyDocConversion> => {
   if (isAnyDocFile(pathname) && (await anydocAvailable())) {
-    return convertWithAnydoc(pathname)
+    return convertWithAnydoc(pathname, t('dialog.importedImagesAppendix'))
   }
   return pandoc(pathname, 'markdown')
 }
 
+/**
+ * A failed import used to leave the user staring at an unchanged window with
+ * only a line in the log. anydoc reports a `code` for every failure mode, so
+ * turn the ones that have an obvious remedy into an actionable notification.
+ */
+const noticeImportFailure = (win: BrowserWindow, pathname: string, err: unknown): void => {
+  const failure = err as (Error & { code?: string; pages?: number[]; pageCount?: number }) | null
+  const code = failure?.code
+  const params: Record<string, string | number> = { filename: path.basename(pathname) }
+  let messageKey = 'dialog.importFailureGeneric'
+
+  switch (code) {
+    case 'needsOcr':
+      messageKey = 'dialog.importNeedsOcr'
+      params.pages = failure?.pages?.join(', ') ?? ''
+      params.pageCount = failure?.pageCount ?? 0
+      break
+    case 'encrypted':
+      messageKey = 'dialog.importEncrypted'
+      break
+    case 'unsupported':
+      messageKey = 'dialog.importUnsupported'
+      break
+    case 'malformed':
+    case 'missingPart':
+      messageKey = 'dialog.importMalformed'
+      break
+    case 'resourceLimit':
+      messageKey = 'dialog.importResourceLimit'
+      break
+    case 'io':
+      messageKey = 'dialog.importIo'
+      break
+    case 'hosted':
+      messageKey = 'dialog.importHosted'
+      break
+    default:
+      params.reason = code ?? (failure?.message || 'unknown error')
+      break
+  }
+
+  win.webContents.send('mt::show-notification', {
+    title: t('dialog.importFailed'),
+    type: 'error',
+    message: t(messageKey, params),
+    time: 12000
+  })
+}
+
 const openConvertedFile = async(windowId: number, pathname: string): Promise<void> => {
+  const win = BrowserWindow.fromId(windowId)
   try {
-    const data = await convertToMarkdown(pathname)
+    const result = await convertToMarkdown(pathname)
+    const data = typeof result === 'string' ? result : result.markdown
     ipcMain.emit('app-open-markdown-by-id', windowId, data)
+
+    if (typeof result !== 'string' && result.assetCount > 0 && win && !win.isDestroyed()) {
+      win.webContents.send('mt::show-notification', {
+        title: t('dialog.importedImagesTitle'),
+        type: 'info',
+        message: t('dialog.importAssetsSaved', {
+          count: result.assetCount,
+          placed: result.placedCount,
+          appended: result.appendedCount,
+          directory: result.assetDirectory ?? ''
+        }),
+        time: 10000
+      })
+    }
   } catch (err) {
     log.error('Error while converting file:', err)
+    if (win && !win.isDestroyed()) noticeImportFailure(win, pathname, err)
   }
 }
 

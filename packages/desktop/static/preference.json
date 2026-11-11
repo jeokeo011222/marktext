@@ -55,7 +55,7 @@
   "footnote": false,
   "texMathDollars": true,
   "texMathGfm": false,
-  "texMathSingleBackslash": false,
+  "texMathSingleBackslash": true,
   "texMathDoubleBackslash": false,
   "fancyLists": false,
   "highlightSyntax": false,

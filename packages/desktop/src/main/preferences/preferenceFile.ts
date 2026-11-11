@@ -13,6 +13,8 @@ import schema from '@shared/preferences/schema.json'
 
 const schemaEntries: Record<string, PreferenceSchemaEntry> = schema
 const rules: Record<string, Rule> = schemaEntries
+// Marker for the one-time switch to single-backslash TeX delimiters by default.
+const SINGLE_BACKSLASH_MIGRATION = 'texMathSingleBackslashDefaultV2'
 const object = (value: unknown): value is Record<string, unknown> =>
   !!value && typeof value === 'object' && !Array.isArray(value)
 const accepts = (value: unknown, rule: Rule): boolean => {
@@ -72,6 +74,19 @@ export class PreferenceFile {
       for (const [key, rule] of Object.entries(rules)) {
         if (accepts(input[key], rule) && input[key] !== undefined)
           this._value[key] = structuredClone(input[key])
+      }
+      // Existing preference files contain the old explicit `false`, which would
+      // keep overriding the new schema default forever. Upgrade once, then leave
+      // the choice alone so turning the option off survives a restart.
+      if (input[SINGLE_BACKSLASH_MIGRATION] !== true) {
+        this._value.texMathSingleBackslash = true
+        this._raw[SINGLE_BACKSLASH_MIGRATION] = true
+        try {
+          this._write(this._pathname, JSON.stringify({ ...this._raw, texMathSingleBackslash: true }, null, 2))
+        }
+        catch {
+          // An unwritable file still keeps the in-memory default; retry next launch.
+        }
       }
     } catch (error) {
       readOnly = (error as NodeJS.ErrnoException).code !== 'ENOENT'

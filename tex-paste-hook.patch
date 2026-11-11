@@ -1,0 +1,404 @@
+# MarkText 粘贴时自动归一化二次转义 LaTeX 定界符
+# 应用方式：在源码根目录执行 git apply tex-paste-hook.patch（或 patch -p1 < tex-paste-hook.patch）
+
+--- a/packages/muya/src/clipboard/paste.ts
++++ b/packages/muya/src/clipboard/paste.ts
+@@ -18,6 +18,7 @@
+ import { pasteClipboardImage, readClipboardImage } from './image';
+ import { hasMarkdownSource } from './markdownSource';
+ import { mergePasteIntoHeading } from './mergePasteIntoHeading';
++import { normalizeEscapedTex } from './normalizeTexDelimiters';
+ import { insertImageSrc, replaceImageAt, resolveImageSrc } from './pasteImage';
+ import { getUrlPaste, pasteUrl } from './pasteUrl';
+ import { PasteType } from './types';
+@@ -507,6 +508,9 @@
+     imageFile: File | null;
+     pasteType: PasteType;
+     internalImage?: IClipboardImage | null;
++    // The text slot was rewritten from doubly escaped TeX; the HTML copy still
++    // holds the raw delimiters and must not win.
++    escapedTex?: boolean;
+ }
+ 
+ function applyNormalizedPaste(
+@@ -570,6 +574,10 @@
+     const hasClipboardHtml = html !== '';
+     if (text.length > 0 && hasMarkdownSource(html))
+         html = '';
++    // Escaped TeX is rewritten in the text slot only; keeping the HTML copy would
++    // paste the raw delimiters back over the normalized Markdown.
++    if (data.escapedTex)
++        html = '';
+ 
+     // Firefox can supply a pasted URL without HTML.
+     if (isHttpUrl(text) && !html) {
+@@ -700,19 +708,23 @@
+     if (!event.clipboardData)
+         return Promise.resolve();
+ 
+-    const text = rawText ?? event.clipboardData.getData('text/plain');
++    const pastedText = rawText ?? event.clipboardData.getData('text/plain');
++    const { text, converted } = normalizeEscapedTex(pastedText);
+     const html = rawHtml ?? event.clipboardData.getData('text/html');
+     const imageFile = getClipboardImageFile(event.clipboardData);
+ 
+-    return applyPaste(clipboard, { text, html, imageFile, pasteType: clipboard.pasteType, internalImage: readClipboardImage(html, text) });
++    return applyPaste(clipboard, { text, html, imageFile, pasteType: clipboard.pasteType, internalImage: readClipboardImage(html, text), escapedTex: converted > 0 });
+ }
+ 
+ // Treat the supplied text as Markdown source without synthesizing rich HTML.
+ export function pastePlainText(clipboard: Clipboard, text: string): Promise<void> {
++    const normalized = normalizeEscapedTex(text);
++
+     return applyPaste(clipboard, {
+-        text,
++        text: normalized.text,
+         html: '',
+         imageFile: null,
+         pasteType: PasteType.PASTE_AS_PLAIN_TEXT,
++        escapedTex: normalized.converted > 0,
+     });
+ }
+--- /dev/null
++++ b/packages/muya/src/clipboard/normalizeTexDelimiters.ts
+@@ -0,0 +1,115 @@
++// Text copied from chat UIs, JSON payloads or log output is often escaped one
++// time too many: the delimiters arrive as \\( ... \\) / \\[ ... \\] and the math
++// body keeps escaped underscores, so the editor would show the raw source
++// instead of math. Rewrite those payloads to the $ / $$ delimiters it parses.
++
++const ESCAPED_BLOCK = /\\\\\[([\s\S]*?)\\\\\]/g;
++const ESCAPED_INLINE = /\\\\\(([\s\S]*?)\\\\\)/g;
++// A body escaped together with its delimiters always carries one of these.
++const ESCAPE_HINT = /\\_|\\\\[a-z]/i;
++const INLINE_CODE = /`[^`\n]*`/g;
++const FENCE = /^\s*(?:```|~~~)/;
++// Escaped literal brackets in prose, e.g. \\(注\\) documenting Markdown itself,
++// must not be promoted to math.
++const CJK = /[\u3000-\u303F\u4E00-\u9FFF\uFF00-\uFFEF]/;
++// Private-use sentinels keep masked code spans out of reach of the matchers.
++const MASK_OPEN = '\uE000';
++const MASK_CLOSE = '\uE001';
++const MASK_RESTORE = /\uE000(\d+)\uE001/g;
++
++export interface INormalizeTexResult {
++    text: string;
++    /** Number of math spans rewritten; 0 means the payload was left untouched. */
++    converted: number;
++}
++
++function unescapeTex(tex: string): string {
++    return tex
++        .replace(/\\\\/g, '\\')
++        .replace(/\\_/g, '_')
++        .replace(/\\&/g, '&')
++        .replace(/\\%/g, '%')
++        .replace(/\\#/g, '#');
++}
++
++// Only invert the escaping when the body shows it actually happened; a plain
++// `\\` line break inside an unescaped matrix must survive untouched.
++function fixBody(body: string): string {
++    const tex = body.trim();
++
++    return ESCAPE_HINT.test(tex) ? unescapeTex(tex) : tex;
++}
++
++function isMathBody(body: string): boolean {
++    const tex = body.trim();
++
++    return tex !== '' && !CJK.test(tex);
++}
++
++export function normalizeEscapedTex(source: string): INormalizeTexResult {
++    // Cheap guard: without a doubled backslash there is nothing to rewrite.
++    if (!source.includes('\\\\'))
++        return { text: source, converted: 0 };
++
++    let converted = 0;
++    const normalizedSource = source.replace(/\r\n?/g, '\n');
++
++    const convertInline = (line: string): string => {
++        const codes: string[] = [];
++        const masked = line.replace(INLINE_CODE, (code) => {
++            codes.push(code);
++
++            return `${MASK_OPEN}${codes.length - 1}${MASK_CLOSE}`;
++        });
++        const replaced = masked.replace(ESCAPED_INLINE, (match, body: string) => {
++            if (!isMathBody(body))
++                return match;
++
++            converted += 1;
++
++            return `$${fixBody(body)}$`;
++        });
++
++        return replaced.replace(MASK_RESTORE, (_, index: string) => codes[Number(index)]);
++    };
++
++    const convertSegment = (segment: string[]): string[] => {
++        if (segment.length === 0)
++            return [];
++
++        // Block delimiters may wrap several lines, so match them before splitting.
++        const withBlocks = segment.join('\n').replace(ESCAPED_BLOCK, (match, body: string) => {
++            if (!isMathBody(body))
++                return match;
++
++            converted += 1;
++
++            return `$$\n${fixBody(body)}\n$$`;
++        });
++
++        return withBlocks.split('\n').map(line => convertInline(line));
++    };
++
++    const lines: string[] = [];
++    let segment: string[] = [];
++    let inFence = false;
++
++    for (const line of normalizedSource.split('\n')) {
++        if (FENCE.test(line)) {
++            lines.push(...convertSegment(segment));
++            segment = [];
++            lines.push(line);
++            inFence = !inFence;
++        }
++        else if (inFence) {
++            lines.push(line);
++        }
++        else {
++            segment.push(line);
++        }
++    }
++
++    lines.push(...convertSegment(segment));
++
++    return { text: lines.join('\n'), converted };
++}
+--- /dev/null
++++ b/packages/muya/src/clipboard/__tests__/normalizeTexDelimiters.spec.ts
+@@ -0,0 +1,103 @@
++import { describe, expect, it } from 'vitest';
++import { normalizeEscapedTex } from '../normalizeTexDelimiters';
++
++// Chat UIs and JSON payloads hand back TeX that was escaped together with its
++// delimiters, which the editor would paste as literal text instead of math.
++describe('normalizeEscapedTex', () => {
++    it('rewrites escaped inline delimiters and unescapes the body', () => {
++        const { text, converted } = normalizeEscapedTex(String.raw`模型为 \\(f\_\theta\\)，任务 \\(T\\)。`);
++
++        expect(text).toBe(String.raw`模型为 $f_\theta$，任务 $T$。`);
++        expect(converted).toBe(2);
++    });
++
++    it('rewrites escaped block delimiters onto their own lines', () => {
++        const body = String.raw`D_T(H)= \mathbb E_{X} \left[ \ell\big(f_\theta(X)\big) \right]`;
++        const { text, converted } = normalizeEscapedTex(
++            String.raw`\\[ D_T(H)= \mathbb E\_{X} \left[ \ell\big(f\_\theta(X)\big) \right] \\]`,
++        );
++
++        expect(text).toBe(`$$\n${body}\n$$`);
++        expect(converted).toBe(1);
++    });
++
++    it('keeps block delimiters that wrap several lines', () => {
++        const { text } = normalizeEscapedTex([
++            String.raw`\\[ \begin{aligned}`,
++            String.raw`x &= 1 \\`,
++            String.raw`y &= 2`,
++            String.raw`\end{aligned} \\]`,
++        ].join('\n'));
++
++        expect(text).toBe([
++            '$$',
++            String.raw`\begin{aligned}`,
++            String.raw`x &= 1 \\`,
++            String.raw`y &= 2`,
++            String.raw`\end{aligned}`,
++            '$$',
++        ].join('\n'));
++    });
++
++    it('leaves fenced code and inline code untouched', () => {
++        const escapedTex = String.raw`\\(f\_\theta\\)`;
++        const codeLine = `行内代码 \`${escapedTex}\` 保持原样。`;
++        const source = [
++            String.raw`正文 \\(a^2+b^2\\)。`,
++            '```',
++            `代码 ${escapedTex} 保持原样`,
++            '```',
++            codeLine,
++        ].join('\n');
++
++        const { text, converted } = normalizeEscapedTex(source);
++
++        expect(converted).toBe(1);
++        expect(text).toBe([
++            String.raw`正文 $a^2+b^2$。`,
++            '```',
++            `代码 ${escapedTex} 保持原样`,
++            '```',
++            codeLine,
++        ].join('\n'));
++    });
++
++    it('does not touch Markdown that is already well formed', () => {
++        const source = String.raw`已有 $f_\theta$ 与 \begin{aligned} x &= 1 \\ y &= 2 \end{aligned}`;
++        const { text, converted } = normalizeEscapedTex(source);
++
++        expect(converted).toBe(0);
++        expect(text).toBe(source);
++    });
++
++    it('leaves escaped literal brackets in prose alone', () => {
++        const source = String.raw`这里说明 Markdown 的 \\(注\\) 写法。`;
++        const { text, converted } = normalizeEscapedTex(source);
++
++        expect(converted).toBe(0);
++        expect(text).toBe(source);
++    });
++
++    it('keeps line breaks inside an unescaped matrix', () => {
++        const source = ['$$', String.raw`x &= 1 \\`, String.raw`y &= 2`, '$$'].join('\n');
++        const { text, converted } = normalizeEscapedTex(source);
++
++        expect(converted).toBe(0);
++        expect(text).toBe(source);
++    });
++
++    it('ignores an unterminated escaped delimiter', () => {
++        const source = String.raw`未闭合 \\[ a + b`;
++        const { text, converted } = normalizeEscapedTex(source);
++
++        expect(converted).toBe(0);
++        expect(text).toBe(source);
++    });
++
++    it('normalizes CRLF before matching', () => {
++        const source = `${String.raw`\\[ a \\]`}\r\n后续`;
++        const { text } = normalizeEscapedTex(source);
++
++        expect(text).toBe('$$\na\n$$\n后续');
++    });
++});
+--- /dev/null
++++ b/packages/muya/src/clipboard/__tests__/pasteEscapedTex.spec.ts
+@@ -0,0 +1,116 @@
++// @vitest-environment happy-dom
++
++import type Content from '../../block/base/content';
++import type { Muya } from '../../muya';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import { Muya as MuyaClass } from '../../muya';
++import { SelectionDirection } from '../../selection/types';
++
++// Ctrl+V delivers doubly escaped TeX through the text slot. The paste path has
++// to rewrite it to $ / $$ before Markdown parsing, otherwise the delimiters are
++// pasted verbatim and render as literal text instead of math.
++
++vi.mock('../../utils/prism/index', () => ({
++    default: {},
++    walkTokens: () => null,
++    loadedLanguages: new Set(),
++    transformAliasToOrigin: (s: string) => s,
++    loadLanguage: () => Promise.resolve([]),
++    search: () => [],
++}));
++
++vi.mock('../../utils/paste', async (importOriginal) => {
++    const actual = await importOriginal<typeof import('../../utils/paste')>();
++    return { ...actual, normalizePastedHTML: async (html: string) => html };
++});
++
++const bootedHosts: HTMLElement[] = [];
++let hadVersion = false;
++let originalVersion: string | undefined;
++
++beforeEach(() => {
++    hadVersion = 'MUYA_VERSION' in window;
++    originalVersion = window.MUYA_VERSION;
++    window.MUYA_VERSION = 'test';
++});
++
++afterEach(() => {
++    while (bootedHosts.length)
++        bootedHosts.pop()!.remove();
++    if (hadVersion)
++        window.MUYA_VERSION = originalVersion as string;
++    else
++        delete (window as Partial<Window>).MUYA_VERSION;
++});
++
++function bootMuya(markdown: string): Muya {
++    const host = document.createElement('div');
++    document.body.appendChild(host);
++    const muya = new MuyaClass(host, { markdown } as ConstructorParameters<typeof MuyaClass>[1]);
++    muya.init();
++    bootedHosts.push(muya.domNode);
++    return muya;
++}
++
++function firstContent(muya: Muya): Content {
++    return muya.editor.scrollPage!.firstContentInDescendant()!;
++}
++
++function stubSelection(muya: Muya, block: Content, start: number, end: number) {
++    const path = block.path;
++    muya.editor.selection.getTextSelection = () => ({
++        anchor: { offset: start, block, path },
++        focus: { offset: end, block, path },
++        isCollapsed: start === end,
++        isSelectionInSameBlock: true,
++        direction: SelectionDirection.FORWARD,
++    });
++}
++
++function pasteEvent(text: string, html: string) {
++    return {
++        preventDefault() {},
++        stopPropagation() {},
++        clipboardData: {
++            getData: (t: string) => (t === 'text/plain' ? text : html),
++            files: [],
++            items: [],
++        },
++    } as unknown as ClipboardEvent;
++}
++
++async function pasteInto(muya: Muya, block: Content, text: string, html = '') {
++    stubSelection(muya, block, 0, block.text.length);
++    await muya.editor.clipboard.pasteHandler(pasteEvent(text, html), text, html);
++    await new Promise(r => setTimeout(r, 40));
++}
++
++describe('paste — escaped TeX is normalized before parsing', () => {
++    it('rewrites escaped inline delimiters from the text slot', async () => {
++        const muya = bootMuya('');
++        const para = firstContent(muya);
++
++        await pasteInto(muya, para, String.raw`模型为 \\(f\_\theta\\)。`);
++
++        expect(para.text).toBe(String.raw`模型为 $f_\theta$。`);
++    });
++
++    it('prefers the normalized text over an HTML copy holding raw delimiters', async () => {
++        const muya = bootMuya('');
++        const para = firstContent(muya);
++        const html = `<span>${String.raw`\\(f\_\theta\\)`}</span>`;
++
++        await pasteInto(muya, para, String.raw`\\(f\_\theta\\)`, html);
++
++        expect(para.text).toBe(String.raw`$f_\theta$`);
++    });
++
++    it('pastes ordinary text unchanged', async () => {
++        const muya = bootMuya('');
++        const para = firstContent(muya);
++
++        await pasteInto(muya, para, '普通文本');
++
++        expect(para.text).toBe('普通文本');
++    });
++});

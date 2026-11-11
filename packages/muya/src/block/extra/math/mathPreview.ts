@@ -4,6 +4,7 @@ import katex from 'katex';
 import { fromEvent } from 'rxjs';
 import { CLASS_NAMES } from '../../../config';
 import { escapeHTML } from '../../../utils';
+import { toKaTeXCompatible } from '../../../utils/katexCompat';
 import logger from '../../../utils/logger';
 import Parent from '../../base/parent';
 import 'katex/dist/contrib/mhchem.mjs';
@@ -68,8 +69,10 @@ class MathPreview extends Parent {
 
         if (math) {
             try {
-                const html = katex.renderToString(math, {
+                const compat = toKaTeXCompatible(math, { displayMode: true });
+                const html = katex.renderToString(compat.tex, {
                     displayMode: true,
+                    macros: compat.macros,
                 });
                 this.domNode!.innerHTML = html;
             }

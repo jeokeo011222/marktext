@@ -203,7 +203,7 @@ export const usePreferencesStore = defineStore('preferences', {
     footnote: false,
     texMathDollars: true,
     texMathGfm: false,
-    texMathSingleBackslash: false,
+    texMathSingleBackslash: true,
     texMathDoubleBackslash: false,
     fancyLists: false,
     highlightSyntax: false,

@@ -3,6 +3,7 @@ import type Renderer from './index';
 import type { IRenderBlock, ISyntaxRenderOptions } from './types';
 import katex from 'katex';
 import { CLASS_NAMES } from '../../config';
+import { toKaTeXCompatible } from '../../utils/katexCompat';
 import { htmlToVNode } from '../../utils/snabbdom';
 import { delimitedParts } from './delimitedParts';
 import 'katex/dist/contrib/mhchem.mjs';
@@ -75,7 +76,10 @@ export default function inlineMath(this: Renderer, {
 
     const { loadMathMap } = this;
 
-    const key = JSON.stringify([math, type, displayMode]);
+    // Compatibility rewrites can change as labels are discovered, so the cache
+    // key uses the rewritten source rather than the raw token text.
+    const compat = toKaTeXCompatible(math, { displayMode });
+    const key = JSON.stringify([compat.tex, compat.macros, type, displayMode]);
     let mathVnode = null;
     let previewSelector = `span.${CLASS_NAMES.MU_MATH_RENDER}`;
     // Inline math errors stay compact to keep the surrounding text baseline
@@ -86,8 +90,9 @@ export default function inlineMath(this: Renderer, {
     }
     else {
         try {
-            const html = katex.renderToString(math, {
+            const html = katex.renderToString(compat.tex, {
                 displayMode,
+                macros: compat.macros,
             });
             mathVnode = htmlToVNode(html);
             loadMathMap.set(key, mathVnode);

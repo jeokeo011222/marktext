@@ -39,6 +39,7 @@ import { deepClone } from './utils';
 import { getBlock } from './utils/dom';
 import { GITHUB_ALERT_TYPES, githubAlertBlockType, githubAlertMarker } from './utils/githubAlerts';
 import { imageToMarkdown } from './utils/image';
+import { resetMathNumbering } from './utils/katexCompat';
 import { toListDelimiter } from './utils/listMarker';
 import './assets/styles/blockSyntax.css';
 import './assets/styles/index.css';
@@ -200,6 +201,8 @@ export class Muya {
     }
 
     constructor(element: HTMLElement, options?: Partial<IMuyaOptions>) {
+        // Labels and equation numbers belong to one document, not the process.
+        resetMathNumbering();
         this.options = Object.assign({}, MUYA_DEFAULT_OPTIONS, options ?? {});
         this.eventCenter = new EventCenter();
         this.domNode = getContainer(element, this.options);

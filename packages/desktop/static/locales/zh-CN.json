@@ -643,7 +643,7 @@
         "footnote": "脚注",
         "texMathDollars": "使用 $ 和 $$ 的 TeX 数学公式",
         "texMathGfm": "GitHub 的 TeX 数学公式（$`…`$ 和 ```math）",
-        "texMathSingleBackslash": "使用单反斜杠分隔符的 TeX 数学公式",
+        "texMathSingleBackslash": "使用单反斜杠分隔符的 TeX 数学公式（推荐：兼容 \\(...\\) 与 \\[...\\]）",
         "texMathDoubleBackslash": "使用双反斜杠分隔符的 TeX 数学公式",
         "fancyLists": "字母和罗马数字列表",
         "highlightSyntax": "高亮 (==文本==)",
@@ -777,7 +777,7 @@
     }
   },
   "about": {
-    "copyright": "Copyright © Luo Ran 2017-{year}",
+    "copyright": "Copyright © 量子之眼 2017-{year}",
     "copyrightContributors": "版权贡献者"
   },
   "commands": {
@@ -938,6 +938,18 @@
     "file": "文件",
     "fileExists": "文件已存在：{filename}",
     "files": "文件",
+    "importFailed": "导入失败",
+    "importFailureGeneric": "无法导入 {filename}：{reason}",
+    "importNeedsOcr": "该 PDF 含扫描页（第 {pages} 页 / 共 {pageCount} 页），anydoc 不做 OCR。请先对这些页面做 OCR，或换用其他转换工具。",
+    "importEncrypted": "文档已加密或受密码保护，无法读取内容。请先解除保护。",
+    "importUnsupported": "anydoc 无法解析该格式，请先用其他工具转成 DOCX 或 PDF。",
+    "importMalformed": "文档结构损坏或没有可提取的内容。",
+    "importResourceLimit": "文档超出 anydoc 的安全限制（体积过大或嵌套层级过深）。",
+    "importIo": "无法读取文件，请检查路径与访问权限。",
+    "importHosted": "托管 OCR 转换失败，请稍后重试或改用本地 OCR。",
+    "importAssetsSaved": "已提取 {count} 张图片并保存到 {directory}；{placed} 张按原位置插回，{appended} 张附在文末。",
+    "importedImagesTitle": "图片已导入",
+    "importedImagesAppendix": "导入的图片",
     "importWarning": "导入警告",
     "installPandoc": "未找到 Pandoc。请先安装，或将环境变量 MARKTEXT_PANDOC 设为 pandoc 可执行文件的路径后重启 MarkText。",
     "exportWarning": "导出提示",
