@@ -643,7 +643,7 @@
         "footnote": "Nota a piè di pagina",
         "texMathDollars": "Espressioni matematiche TeX: $ e $$",
         "texMathGfm": "Espressioni matematiche TeX tipo GitHub: ($`…`$ e ```math)",
-        "texMathSingleBackslash": "Delimitatori di espressione matematica TeX con singola barra rovesciata",
+        "texMathSingleBackslash": "Delimitatori di espressione matematica TeX con singola barra rovesciata (consigliato)",
         "texMathDoubleBackslash": "Delimitatori di espressione matematica TeX con doppia barra rovesciata",
         "fancyLists": "Elenchi con lettere e numeri romani",
         "highlightSyntax": "Evidenziazione (==testo==)",
@@ -778,7 +778,11 @@
   },
   "about": {
     "copyright": "Copyright © Luo Ran 2017-{year}",
-    "copyrightContributors": "Creato con <3 dai Collaboratori di GitHub"
+    "copyrightContributors": "Creato con <3 dai Collaboratori di GitHub",
+    "linkForkReadme": "Fork · Funzionalità",
+    "linkForkReleases": "Fork · Rilasci",
+    "linkForkIssues": "Fork · Segnala un problema",
+    "linkUpstream": "Upstream · Crediti"
   },
   "commands": {
     "mt": {

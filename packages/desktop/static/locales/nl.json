@@ -643,7 +643,7 @@
         "footnote": "Voetnoot",
         "texMathDollars": "TeX-wiskunde met $ en $$",
         "texMathGfm": "GitHub TeX-wiskunde ($`…`$ en ```math)",
-        "texMathSingleBackslash": "TeX-wiskunde met enkele backslash",
+        "texMathSingleBackslash": "TeX-wiskunde met enkele backslash (aanbevolen)",
         "texMathDoubleBackslash": "TeX-wiskunde met dubbele backslash",
         "fancyLists": "Lijsten met letters en Romeinse cijfers",
         "highlightSyntax": "Markeren (==tekst==)",
@@ -778,7 +778,11 @@
   },
   "about": {
     "copyright": "Copyright © Luo Ran 2017-{year}",
-    "copyrightContributors": "Gemaakt met <3 door GitHub-bijdragers"
+    "copyrightContributors": "Gemaakt met <3 door GitHub-bijdragers",
+    "linkForkReadme": "Fork · Functies",
+    "linkForkReleases": "Fork · Releases",
+    "linkForkIssues": "Fork · Probleem melden",
+    "linkUpstream": "Upstream · Dankbetuiging"
   },
   "commands": {
     "mt": {

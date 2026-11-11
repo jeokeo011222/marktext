@@ -643,7 +643,7 @@
         "footnote": "脚注",
         "texMathDollars": "使用 $ 和 $$ 的 TeX 数学公式",
         "texMathGfm": "GitHub 的 TeX 数学公式（$`…`$ 和 ```math）",
-        "texMathSingleBackslash": "使用单反斜杠分隔符的 TeX 数学公式（推荐：兼容 \\(...\\) 与 \\[...\\]）",
+        "texMathSingleBackslash": "使用单反斜杠分隔符的 TeX 数学公式（推荐）",
         "texMathDoubleBackslash": "使用双反斜杠分隔符的 TeX 数学公式",
         "fancyLists": "字母和罗马数字列表",
         "highlightSyntax": "高亮 (==文本==)",
@@ -778,7 +778,11 @@
   },
   "about": {
     "copyright": "Copyright © 量子之眼 2017-{year}",
-    "copyrightContributors": "版权贡献者"
+    "copyrightContributors": "版权贡献者",
+    "linkForkReadme": "本分支 · 功能说明",
+    "linkForkReleases": "本分支 · 下载与更新",
+    "linkForkIssues": "本分支 · 问题反馈",
+    "linkUpstream": "上游原版 · 致谢"
   },
   "commands": {
     "mt": {

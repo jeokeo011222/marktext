@@ -3,7 +3,7 @@
   "version": "0.24.0-dev",
   "description": "MarkText monorepo root",
   "private": true,
-  "homepage": "https://github.com/marktext/marktext",
+  "homepage": "https://github.com/jeokeo011222/marktext#readme",
   "packageManager": "pnpm@10.33.4",
   "engines": {
     "node": ">=22.12.0",

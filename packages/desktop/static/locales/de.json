@@ -643,7 +643,7 @@
         "footnote": "Fußnote",
         "texMathDollars": "TeX-Mathematik mit $ und $$",
         "texMathGfm": "GitHub-TeX-Mathematik ($`…`$ und ```math)",
-        "texMathSingleBackslash": "TeX-Mathematik mit einfachem Backslash",
+        "texMathSingleBackslash": "TeX-Mathematik mit einfachem Backslash (empfohlen)",
         "texMathDoubleBackslash": "TeX-Mathematik mit doppeltem Backslash",
         "fancyLists": "Listen mit Buchstaben und römischen Ziffern",
         "highlightSyntax": "Hervorhebung (==text==)",
@@ -778,7 +778,11 @@
   },
   "about": {
     "copyright": "Copyright © Luo Ran 2017-{year}",
-    "copyrightContributors": "Urheberrecht Mitwirkende"
+    "copyrightContributors": "Urheberrecht Mitwirkende",
+    "linkForkReadme": "Fork · Funktionen",
+    "linkForkReleases": "Fork · Releases",
+    "linkForkIssues": "Fork · Problem melden",
+    "linkUpstream": "Upstream · Danksagung"
   },
   "commands": {
     "mt": {

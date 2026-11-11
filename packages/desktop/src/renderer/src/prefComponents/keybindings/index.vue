@@ -5,7 +5,7 @@
       {{ t('preferences.keybindings.description') }}
       <help-link
         class="shortcut-docs"
-        href="https://marktext.me/docs/key-bindings"
+        href="https://github.com/jeokeo011222/marktext/blob/develop/packages/website/content/docs/end-user/KEYBINDINGS.md"
         :label="t('preferences.keybindings.online')"
       />
     </setting-note>

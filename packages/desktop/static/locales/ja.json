@@ -643,7 +643,7 @@
         "footnote": "脚注",
         "texMathDollars": "$ と $$ による TeX 数式",
         "texMathGfm": "GitHub の TeX 数式（$`…`$ と ```math）",
-        "texMathSingleBackslash": "単一バックスラッシュの TeX 数式",
+        "texMathSingleBackslash": "単一バックスラッシュの TeX 数式（推奨）",
         "texMathDoubleBackslash": "二重バックスラッシュの TeX 数式",
         "fancyLists": "英字・ローマ数字のリスト",
         "highlightSyntax": "ハイライト (==テキスト==)",
@@ -778,7 +778,11 @@
   },
   "about": {
     "copyright": "Copyright © Luo Ran 2017-{year}",
-    "copyrightContributors": "著作権貢献者"
+    "copyrightContributors": "著作権貢献者",
+    "linkForkReadme": "Fork · 機能一覧",
+    "linkForkReleases": "Fork · リリース",
+    "linkForkIssues": "Fork · 問題を報告",
+    "linkUpstream": "Upstream · クレジット"
   },
   "commands": {
     "mt": {

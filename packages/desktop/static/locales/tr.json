@@ -643,7 +643,7 @@
         "footnote": "Dipnot",
         "texMathDollars": "$ ve $$ ile TeX matematiği",
         "texMathGfm": "GitHub TeX matematiği ($`…`$ ve ```math)",
-        "texMathSingleBackslash": "Tek ters eğik çizgili TeX matematiği",
+        "texMathSingleBackslash": "Tek ters eğik çizgili TeX matematiği (önerilen)",
         "texMathDoubleBackslash": "Çift ters eğik çizgili TeX matematiği",
         "fancyLists": "Harfli ve Roma rakamlı listeler",
         "highlightSyntax": "Vurgu (==metin==)",
@@ -778,7 +778,11 @@
   },
   "about": {
     "copyright": "Telif Hakkı © Luo Ran 2017-{year}",
-    "copyrightContributors": "Github Katkıda Bulunanlar tarafından <3 ile yapıldı"
+    "copyrightContributors": "Github Katkıda Bulunanlar tarafından <3 ile yapıldı",
+    "linkForkReadme": "Fork · Özellikler",
+    "linkForkReleases": "Fork · Sürümler",
+    "linkForkIssues": "Fork · Hata bildir",
+    "linkUpstream": "Upstream · Teşekkür"
   },
   "commands": {
     "mt": {

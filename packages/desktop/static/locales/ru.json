@@ -643,7 +643,7 @@
         "footnote": "Сноска",
         "texMathDollars": "TeX-формулы с $ и $$",
         "texMathGfm": "GitHub TeX-формулы ($`…`$ и ```math)",
-        "texMathSingleBackslash": "TeX-формулы с одинарным обратным слешем",
+        "texMathSingleBackslash": "TeX-формулы с одинарным обратным слешем (рекомендуется)",
         "texMathDoubleBackslash": "TeX-формулы с двойным обратным слешем",
         "fancyLists": "Списки с буквами и римскими цифрами",
         "highlightSyntax": "Выделение (==текст==)",
@@ -778,7 +778,11 @@
   },
   "about": {
     "copyright": "Copyright © Luo Ran 2017-{year}",
-    "copyrightContributors": "Сделано с <3 участниками GitHub"
+    "copyrightContributors": "Сделано с <3 участниками GitHub",
+    "linkForkReadme": "Fork · Возможности",
+    "linkForkReleases": "Fork · Релизы",
+    "linkForkIssues": "Fork · Сообщить об ошибке",
+    "linkUpstream": "Upstream · Благодарности"
   },
   "commands": {
     "mt": {

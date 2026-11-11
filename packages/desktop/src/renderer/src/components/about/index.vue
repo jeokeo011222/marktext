@@ -36,6 +36,17 @@
           </div>
         </el-col>
       </el-row>
+      <div class="links">
+        <button
+          v-for="link in links"
+          :key="link.href"
+          type="button"
+          class="link-button"
+          @click="openLink(link.href)"
+        >
+          {{ link.label }}
+        </button>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -53,6 +64,19 @@ const name = 'MarkText'
 const copyright = t('about.copyright', { year: new Date().getFullYear() })
 const copyrightContributors = t('about.copyrightContributors')
 const showAboutDialog = ref(false)
+
+// This build is maintained independently: the About window should lead to this
+// fork, not to the upstream project's pages. The last link stays as attribution.
+const links = [
+  { label: t('about.linkForkReadme'), href: 'https://github.com/jeokeo011222/marktext#readme' },
+  { label: t('about.linkForkReleases'), href: 'https://github.com/jeokeo011222/marktext/releases' },
+  { label: t('about.linkForkIssues'), href: 'https://github.com/jeokeo011222/marktext/issues' },
+  { label: t('about.linkUpstream'), href: 'https://github.com/marktext/marktext' }
+]
+
+const openLink = (href: string): void => {
+  window.electron.shell.openExternal(href)
+}
 
 const store = useMainStore()
 
@@ -95,5 +119,27 @@ onBeforeUnmount(() => {
 
 .about-dialog .text {
   color: var(--floatFontColor);
+}
+
+.about-dialog .links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 12px;
+  margin: 12px 0 4px;
+}
+
+.about-dialog .link-button {
+  padding: 2px 4px;
+  border: none;
+  background: transparent;
+  color: var(--themeColor);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.about-dialog .link-button:hover,
+.about-dialog .link-button:focus-visible {
+  text-decoration: underline;
 }
 </style>

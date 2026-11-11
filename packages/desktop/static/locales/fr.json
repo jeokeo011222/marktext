@@ -643,7 +643,7 @@
         "footnote": "Note de bas de page",
         "texMathDollars": "Maths TeX avec $ et $$",
         "texMathGfm": "Maths TeX de GitHub ($`…`$ et ```math)",
-        "texMathSingleBackslash": "Maths TeX avec barre oblique inverse simple",
+        "texMathSingleBackslash": "Maths TeX avec barre oblique inverse simple (recommandé)",
         "texMathDoubleBackslash": "Maths TeX avec barre oblique inverse double",
         "fancyLists": "Listes à lettres et chiffres romains",
         "highlightSyntax": "Surlignage (==texte==)",
@@ -778,7 +778,11 @@
   },
   "about": {
     "copyright": "Copyright © Luo Ran 2017-{year}",
-    "copyrightContributors": "Contributeurs aux droits d'auteur"
+    "copyrightContributors": "Contributeurs aux droits d'auteur",
+    "linkForkReadme": "Fork · Fonctionnalités",
+    "linkForkReleases": "Fork · Versions",
+    "linkForkIssues": "Fork · Signaler un problème",
+    "linkUpstream": "Upstream · Remerciements"
   },
   "commands": {
     "mt": {
