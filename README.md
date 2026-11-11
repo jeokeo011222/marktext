@@ -2,81 +2,182 @@
   <img src="https://raw.githubusercontent.com/jeokeo011222/marktext/develop/docs/assets/logo-small.png" alt="MarkText" width="110" height="110">
 </p>
 
-<h1 align="center">MarkText <sub>· Enhanced Fork</sub></h1>
+<h1 align="center">MarkText · 增强版</h1>
 
 <div align="center">
-  <strong>Next-generation WYSIWYG markdown editor</strong><br>
-  A simple, elegant, distraction-free markdown editor built on Electron + Vue 3 —<br>
-  now with <b>smarter LaTeX handling</b> and <b>anydoc-powered document import</b>.
+  <strong>一款简洁、优雅、所见即所得的开源 Markdown 编辑器</strong><br>
+  基于 Electron + Vue 3，专注速度与易用性，让写作回到内容本身。<br>
+  支持 Windows、macOS、Linux。
 </div>
 
 <br>
 
 <div align="center">
-  <img src="https://img.shields.io/static/v1?label=Platform&message=Linux%20%7C%20macOS%20%7C%20Windows&color=lightgrey" alt="platform">
-  <img src="https://img.shields.io/github/license/jeokeo011222/marktext" alt="license">
-  <img src="https://img.shields.io/badge/paste--LaTeX--auto--normalize-2ea44f" alt="tex-normalize">
-  <img src="https://img.shields.io/badge/anydoc--Office%2FPDF--import-2ea44f" alt="anydoc-import">
-  <img src="https://img.shields.io/badge/maintained-independently-blue" alt="maintained">
-  <img src="https://img.shields.io/badge/upstream-marktext%2Fmarktext-blueviolet" alt="upstream">
+  <img src="https://img.shields.io/badge/平台-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey" alt="平台">
+  <img src="https://img.shields.io/badge/协议-MIT-blue" alt="协议">
+  <img src="https://img.shields.io/badge/编辑器-所见即所得-2ea44f" alt="WYSIWYG">
+  <img src="https://img.shields.io/badge/公式-KaTeX-ff69b4" alt="KaTeX">
+  <img src="https://img.shields.io/badge/文档导入-anydoc-2ea44f" alt="anydoc">
+  <img src="https://img.shields.io/badge/维护-独立分支-blueviolet" alt="独立分支">
 </div>
 
 <br>
 
 <div align="center">
-  <a href="https://marktext.me">Website</a> ·
-  <a href="#-highlights-of-this-fork">Highlights</a> ·
-  <a href="#-features">Features</a> ·
-  <a href="#-download--install">Download</a> ·
-  <a href="#%EF%B8%8F-development">Development</a>
+  <a href="#overview">功能一览</a> ·
+  <a href="#screenshot">截图</a> ·
+  <a href="#install">下载安装</a> ·
+  <a href="#build">源码构建</a> ·
+  <a href="#upstream">与上游关系</a> ·
+  <a href="#thanks">致谢</a> ·
+  <a href="README.en.md">English</a>
 </div>
 
 <br>
 
 > [!NOTE]
-> **🧪 这是一个独立维护的 fork（Independently maintained fork）。**
-> 本仓库基于上游 [`marktext/marktext`](https://github.com/marktext/marktext) 的 `develop` 分支发展，**不向上游提交 PR**，独立维护以下两项增强。如果你只想用原版，请前往上游仓库下载官方构建。
->
-> **This is an independent fork.** It is maintained separately from upstream and will **not** open PRs back to `marktext/marktext`. Two enhancements are carried as a local patch set (see [Relationship to upstream](#-relationship-to-upstream)).
->
-> | 增强 Enhancement | 解决的问题 Problem it solves |
-> | --- | --- |
-> | 📐 **粘贴即归一化 LaTeX 定界符** | 从大模型对话 / JSON / 日志复制的公式常带二次转义（`\\(` `\\]` `\_`），原样粘贴会显示为源码 |
-> | 📄 **anydoc 导入 Office / PDF** | 原导入仅支持 pandoc 的少数格式，PPT / Excel / PDF / RTF 无法导入 |
+> **关于本仓库**：这是 [`marktext/marktext`](https://github.com/marktext/marktext) 的**独立维护分支**，不向上游提交 PR。原版功能完整保留，另新增两项能力：**粘贴时自动归一化 LaTeX 公式定界符**、**用 anydoc 导入 Office / PDF 文档**。若只需原版，请前往上游下载官方构建。
 
 ---
 
-## 📋 Table of Contents
+## 📑 目录
 
-- [✨ Highlights of this fork](#-highlights-of-this-fork)
-- [🎯 Features](#-features)
-- [🖼️ Screenshot](#️-screenshot)
-- [📥 Download & Install](#-download--install)
-- [🛠️ Development](#️-development)
-- [🔗 Relationship to upstream](#-relationship-to-upstream)
-- [📜 License](#-license)
+- [🎯 功能一览](#overview)
+- [📝 写作与编辑](#editing)
+- [🧩 Markdown 语法与扩展](#syntax)
+- [📊 图表与可视化](#diagrams)
+- [🖼️ 图片与媒体](#images)
+- [🎨 主题与外观](#themes)
+- [📤 导入与导出](#io)
+- [🚀 本分支新增的两项能力](#fork-extras)
+- [🖼️ 截图](#screenshot)
+- [📥 下载与安装](#install)
+- [🛠️ 从源码构建](#build)
+- [🔗 与上游的关系](#upstream)
+- [📜 开源许可](#license)
+- [🙏 致谢原版](#thanks)
 
 ---
 
-## ✨ Highlights of this fork
+<a id="overview"></a>
 
-### 1. 📐 Paste LaTeX from anywhere — auto-normalized
+## 🎯 功能一览
 
-Text copied from chat UIs, JSON payloads or log output often arrives escaped one
-time too many: the delimiters come as `\( ... \)` / `\[ ... \]` and the math body
-keeps escaped underscores. Neither form is a delimiter the editor parses, so the
-paste lands as literal source text instead of rendered math.
+| 领域 | 你能做什么 |
+| :--- | :--- |
+| **写作与编辑** | 实时所见即所得预览、三种编辑模式、快速插入、行转换、表格工具、查找替换、文档统计、拼写检查 |
+| **Markdown 语法** | CommonMark + GFM + Pandoc 扩展，数学公式、脚注、任务列表、表格、GitHub Alerts、Front Matter |
+| **图表与可视化** | Mermaid、PlantUML、Vega-Lite、flowchart、sequence，可放大、导出 SVG/PNG |
+| **图片与媒体** | 剪贴板直接粘贴、图床上传、自动归集到相对资源目录、媒体查看器 |
+| **主题与外观** | 多套亮色/暗色主题、跟随系统、自定义主题、导出专用主题 |
+| **导入与导出** | 导出 HTML / PDF / 打印及 pandoc 多格式；导入 Office、PDF、RTF、EPUB、CSV 等 |
+| **效率与工程** | 多标签页、目录树、阅读模式、快捷键体系、命令行启动、便携版、可编辑偏好文件 |
+| **本分支增强** | 粘贴公式自动归一化、anydoc 全格式文档导入 |
 
-**This fork rewrites such payloads to `$ ... $` / `$$ ... $$` the moment you paste** —
-both with <kbd>Ctrl</kbd>+<kbd>V</kbd> and *Paste as Plain Text* — and drops the
-HTML clipboard copy so the raw delimiters are not pasted back over the normalized
-Markdown. Bodies without the escaping signature stay untouched, so a plain `\\`
-line break in a matrix survives, as do escaped literal brackets in prose and any
-content inside fenced or inline code.
+一句话概括：**输入即排版，公式即渲染，文档即导入。**
 
-> 中文：从大模型、JSON、日志里粘出来的公式常是二次转义形态（`\\(f\_\theta\\)`），粘贴后变成源码。**本 fork 在粘贴瞬间自动还原为标准 `$f_\theta$`**，无需手动改。代码块与行内代码内的内容不会被误改。
+---
 
-Before / after:
+<a id="editing"></a>
+
+## 📝 写作与编辑
+
+- **实时所见即所得（WYSIWYG）**：输入 Markdown 语法后即时呈现排版效果，界面干净，专注写作不被打扰。
+- **三种编辑模式**：**源代码模式**（直接编辑纯文本）、**打字机模式**（当前行始终居中）、**专注模式**（只高亮当前段落）；另有**阅读模式**与**预览标签页**。
+- **快速插入**：新行输入 `/` 即唤出功能菜单，标题、列表、表格、代码块、图表一键插入。
+- **行转换器**：把当前行一键转成其他块类型，并支持复制行、在块后插入段落、删除行。
+- **表格工具**：`Ctrl/Cmd + Shift + T` 呼出表格对话框，自由设定行列数；后续可增删行列、移动单元格、设置对齐，单元格内仍可用行内格式。
+- **查找与替换**、**标题与文档导航**：长文档可快速跳转。
+- **文档统计**：标题栏实时显示字数、段落数、字符数、含空格字符数，以及文件创建/修改时间；有选区时同时显示选区与全文统计。
+- **输入辅助**：括号与引号自动补全、链接自动识别、选区与删除操作增强。
+- **拼写检查**：多语言词典、自定义词典、可隐藏拼写标记。
+- **文件级控制**：文件编码、行尾换行符（LF/CRLF）可分别设置。
+- **多文件工作区**：多标签页、单窗口打开多个目录、目录树中移动文件与文件夹。
+- **效率设施**：完整的跨平台快捷键体系、命令行（CLI）启动与只读打开、便携版（Portable）支持；偏好设置可在图形界面调整，也可直接编辑 `preferences.json`。
+
+---
+
+<a id="syntax"></a>
+
+## 🧩 Markdown 语法与扩展
+
+| 规范 / 扩展 | 支持内容 |
+| :--- | :--- |
+| **CommonMark** | 标题、段落、换行、分隔线、强调、链接、图片、引用、列表、花式列表、代码块、原始 HTML、反斜杠转义 |
+| **GitHub Flavored Markdown** | 删除线、任务列表（Todo List）、表格、扩展自动链接 |
+| **Pandoc 扩展** | 脚注、上标与下标、**数学公式** |
+| **其他约定** | GitHub Alerts（`> [!NOTE]` 等）、高亮 `==text==`、行内 diff、多行引用、键盘按键、Emoji 短码、Front Matter、命名锚点 |
+
+- **数学公式**：由 KaTeX 渲染，行内 `$...$` 与块级 `$$...$$` 均支持，导出 HTML/PDF 时一并保留。
+- **代码高亮**：围栏代码块标注语言（如 ` ```js `）即自动着色。
+- **导出一致性**：HTML/PDF 渲染器会读取文档中的公式、脚注、上下标、高亮、行内 diff、多行引用与 GitHub Alerts 配置，折叠的标题仍会导出完整章节内容。
+
+---
+
+<a id="diagrams"></a>
+
+## 📊 图表与可视化
+
+在代码块围栏上标注语言即可渲染图表，支持 **Mermaid、PlantUML、Vega-Lite、flowchart、sequence** 五类。Mermaid 覆盖流程图、甘特图、时序图、类图等常用类型。
+
+鼠标悬停已渲染的图表会出现工具栏：可放大查看，也可**另存为 SVG、另存为 PNG，或直接复制为图片**粘贴到聊天窗口与幻灯片，无需导出整篇文档。本地渲染的图表 PNG 导出使用编辑器背景色。
+
+---
+
+<a id="images"></a>
+
+## 🖼️ 图片与媒体
+
+- **剪贴板直接粘贴图片**，无需先保存文件。
+- **图床上传**：可配置所选 uploader，插入时自动上传并替换为远程地址。
+- **本地归集**：插入的本地图片可自动复制到指定目录，支持相对 `assets` 路径（`assets`、`../assets`、`assets/${filename}` 等变量），远程 URL 保持原样；未保存文档回退到全局目录。
+- **保留原位置**：也可选择不移动，仅引用原路径。
+- **媒体查看器**：放大预览图表与图片。
+
+---
+
+<a id="themes"></a>
+
+## 🎨 主题与外观
+
+内置多套亮色与暗色主题（**Cadmium Light**、**Material Dark** 等），首次启动默认跟随系统主题；也可关闭跟随、在主题菜单中固定选择，或在偏好设置里分别指定亮/暗变体。支持**自定义主题**，以及独立于界面主题的**导出页面主题**。
+
+---
+
+<a id="io"></a>
+
+## 📤 导入与导出
+
+**导出**
+
+- **HTML / PDF / 打印**：PDF 与打印可设置纸张尺寸、方向、页边距；HTML 可设置页面标题。
+- **版式控制**：覆盖字体、字号、行高，标题自动编号，选择是否显示 Front Matter。
+- **页眉页脚**：PDF 与打印支持无 / 单格 / 三格页眉，页眉按页重复，页脚固定于底部。
+- **pandoc 多格式**：docx、odt、rtf、epub、latex、rst、org、mediawiki、textile。
+
+**导入**（`文件 → 导入`）
+
+| 走 anydoc（本分支新增） | 仍走 pandoc |
+| :--- | :--- |
+| doc / docx / docm | html |
+| ppt / pptx / pps | latex / rst / org |
+| xls / xlsx | wiki / opml / textile |
+| odt / ods / odp | |
+| rtf · epub · csv · **pdf** | |
+
+anydoc 是 Rust 实现的文档解析器，转换时**保留表格、标题层级与文档结构**；以惰性方式加载，缺少平台二进制时自动回退到 pandoc，不会导致程序无法启动。
+
+---
+
+<a id="fork-extras"></a>
+
+## 🚀 本分支新增的两项能力
+
+### 1. 粘贴时自动归一化 LaTeX 公式
+
+从大模型对话、JSON 输出或日志里复制的公式，常因多转义一次而变成 `\\( ... \\)` / `\\[ ... \\]`，连下划线也写成 `\_`。MarkText 不把这些当作公式定界符，粘贴后只会显示一堆源码。
+
+本分支在**粘贴瞬间**将其还原为标准 `$...$` 与 `$$...$$`，`Ctrl+V` 与「粘贴为纯文本」两条路径都覆盖；同时丢弃剪贴板中的 HTML 副本，避免原始定界符被重新贴回来。没有转义特征的内容不会被改动——矩阵里正常的 `\\` 换行、正文中转义的字面括号、围栏代码块与行内代码均保持原样。
 
 ```diff
 - 设模型为 \\(f\_\theta\\)，其计算结构为 \\[ G_T=(V_T,E_T,W_T) \\]
@@ -84,119 +185,104 @@ Before / after:
 + $$ G_T=(V_T,E_T,W_T) $$
 ```
 
-### 2. 📄 Import Office, PDF and RTF with anydoc
+### 2. 用 anydoc 导入 Office / PDF / RTF
 
-The original *File → Import* path only knew the formats pandoc reads — five of the
-fourteen that anydoc covers. PowerPoint, Excel, PDF and RTF were not importable at
-all, and `.docx` came through with tables flattened.
+原版导入仅覆盖 pandoc 能读的少数格式，PPT、Excel、PDF、RTF 完全无法导入，`.docx` 的表格也会被压平。本分支按扩展名分派给 anydoc，补齐了上述格式（详见 [导入与导出](#io)）。
 
-**This fork dispatches by extension** and routes the formats below through
-[`@firecrawl/anydoc`](https://github.com/firecrawl/anydoc) — a Rust document
-parser that keeps tables, headings and structure intact:
-
-| Routed to **anydoc** (new)        | Still routed to **pandoc** |
-| --------------------------------- | --------------------------- |
-| doc / docx / docm                 | html                        |
-| ppt / pptx / pps                 | latex / rst / org           |
-| xls / xlsx                       | wiki / opml / textile       |
-| odt / ods / odp                  |                             |
-| rtf · epub · csv · **pdf**       |                             |
-
-anydoc is a napi binding loaded lazily; a host without the platform binary
-gracefully falls back to pandoc instead of failing to boot.
-
-> 中文：原「导入」只支持 pandoc 能读的少数格式，**PPT / Excel / PDF / RTF 根本导不进来**。本 fork 新增 anydoc 通路，`File → Import` 现在支持上述全部格式，表格与标题结构完整保留。
+> 两项增强均以小补丁形式维护，改动集中在 `packages/muya/src/clipboard/`、`packages/desktop/src/main/utils/anydoc.ts` 与 `packages/desktop/src/main/menu/actions/file.ts`。
 
 ---
 
-## 🎯 Features
+<a id="screenshot"></a>
 
-- 📝 **Real-time WYSIWYG preview** with a clean, distraction-free interface.
-- 📐 **Math expressions** rendered with KaTeX, plus front matter and emoji support.
-- 📊 **Diagrams** via Mermaid and PlantUML.
-- 📑 **Outline / table of contents** for long documents.
-- 🌗 **Multiple editing modes**: Source Code, Typewriter and Focus mode.
-- 🎨 **Various themes**: Cadmium Light, Material Dark and more.
-- 🖼️ **Paste images** directly from the clipboard.
-- 📤 **Export** to HTML and PDF.
-- ✅ **CommonMark + GitHub Flavored Markdown** conformance.
-- ⌨️ Paragraph and inline-style shortcuts to speed up writing.
-- 📐📄 **(fork) Auto-normalized LaTeX on paste** and **anydoc document import** — see [Highlights](#-highlights-of-this-fork).
+## 🖼️ 截图
+
+![MarkText 界面](https://raw.githubusercontent.com/jeokeo011222/marktext/develop/docs/assets/marktext.png?raw=true)
 
 ---
 
-## 🖼️ Screenshot
+<a id="install"></a>
 
-![MarkText](https://raw.githubusercontent.com/jeokeo011222/marktext/develop/docs/assets/marktext.png?raw=true)
+## 📥 下载与安装
 
----
+本分支的两项增强**尚未发布官方安装包**，有两种使用方式：
 
-## 📥 Download & Install
+1. **使用上游官方构建**（稳定、已签名，但不含本分支增强）：<https://github.com/marktext/marktext/releases/latest>
+2. **从源码构建本分支**以获得公式归一化与 anydoc 导入能力，见下节。
 
-The two enhancements above are **not yet published as official installers**. You have two options:
-
-1. **Use the upstream release** for a stable, signed build — just without the fork enhancements:
-   👉 <https://github.com/marktext/marktext/releases/latest>
-2. **Build this fork from source** to get the LaTeX + anydoc features (see [Development](#️-development)).
-
-Requires **Windows 10/11, macOS 13+ or a modern Linux** distribution.
+系统要求：**Windows 10/11**、**macOS 13+** 或现代 Linux 发行版；x64 与 arm64 均可。
 
 ---
 
-## 🛠️ Development
+<a id="build"></a>
 
-This is a pnpm workspace. All commands run from the repo root.
+## 🛠️ 从源码构建
+
+项目为 pnpm workspace，以下命令均在仓库根目录执行：
 
 ```bash
-# Install dependencies (downloads Electron, rebuilds native modules)
-pnpm install
-
-# Run in development mode (renderer hot-reloads)
-pnpm run dev
-
-# Build without packaging — fast path to verify the renderer/main compile
-pnpm run build:unpack
-
-# Package installers for your platform
-pnpm run build:win     # Windows x64 / arm64 — NSIS installer + zip
-pnpm run build:mac     # macOS — DMG + zip
-pnpm run build:linux   # Linux — AppImage, snap, deb, rpm, tar.gz
+pnpm install                 # 安装依赖（下载 Electron、重建原生模块）
+pnpm run dev                 # 开发模式启动，渲染进程热更新
+pnpm run build:unpack        # 只编译不打包，快速验证主/渲染进程
+pnpm run build:win           # Windows 安装包（NSIS + zip）
+pnpm run build:mac           # macOS（DMG + zip）
+pnpm run build:linux         # Linux（AppImage、snap、deb、rpm、tar.gz）
 ```
 
-> ⚠️ On Windows, native modules (`ced`, `native-keymap`, …) are compiled with
-> `node-gyp` and need the **VS 2022 (or newer) C++ build tools**. If `pnpm install`
-> skips native compilation, run `pnpm rebuild` afterwards.
-
-Tests & checks:
+检查与测试：
 
 ```bash
-pnpm run test          # desktop unit tests (Vitest)
-pnpm run test:e2e      # end-to-end tests (Playwright)
-pnpm run lint          # ESLint (run before committing)
+pnpm run test          # 桌面端单元测试（Vitest）
+pnpm run test:e2e      # 端到端测试（Playwright）
+pnpm run lint          # ESLint
 pnpm run typecheck     # vue-tsc --noEmit
 ```
 
+> ⚠️ Windows 上 `ced`、`native-keymap` 等原生模块需 node-gyp 编译，依赖 **VS 2022 及以上 C++ 生成工具**。若安装时跳过了原生编译，补跑 `pnpm rebuild` 即可。
+
 ---
 
-## 🔗 Relationship to upstream
+<a id="upstream"></a>
 
-- This repository is a **fork** of [`marktext/marktext`](https://github.com/marktext/marktext),
-  tracking its `develop` branch as the base.
-- It is **maintained independently** and does **not** open pull requests back to upstream.
-- The two enhancements are carried as a small, reviewable **patch set** on top of the
-  base. To bring in upstream changes later:
+## 🔗 与上游的关系
+
+- 本仓库 fork 自 [`marktext/marktext`](https://github.com/marktext/marktext)，以其 `develop` 分支为基线。
+- **独立维护，不向上游提交 PR**；上游的功能更新由我们自行合并。
+- 两项增强以可审阅的小补丁叠加在基线之上，跟进上游时可重放：
 
   ```bash
   git remote add upstream https://github.com/marktext/marktext.git
   git fetch upstream
-  git rebase upstream/develop     # replay the fork patches onto the new base
+  git rebase upstream/develop
   ```
-
-- All credit for the editor engine, UI and ecosystem goes to the MarkText authors
-  and contributors. This fork only adds the two focused enhancements described above.
 
 ---
 
-## 📜 License
+<a id="license"></a>
 
-Released under the **MIT License** — same as upstream. See [LICENSE](LICENSE).
+## 📜 开源许可
+
+延续上游的 **MIT License**，保留原项目版权声明。详见 [LICENSE](LICENSE)。
+
+---
+
+<a id="thanks"></a>
+
+## 🙏 致谢原版
+
+本项目的几乎全部能力，都来自 **[marktext/marktext](https://github.com/marktext/marktext)**。
+
+衷心感谢作者 [**Jocs**](https://github.com/Jocs) 与 [所有贡献者](https://github.com/marktext/marktext/graphs/contributors)，以及多年来维护 Muya 编辑器引擎、界面、主题体系、多语言文档与跨平台构建链的社区成员。上面列出的每一项功能——实时预览、CommonMark/GFM 兼容、KaTeX 公式、五类图表、表格工具、图片工作流、主题与导出——都是原版已经做好的工作，本分支只是沿用并如实记录。
+
+也一并感谢 **KaTeX、Mermaid、PlantUML、Vega-Lite、pandoc、anydoc、Electron、Vue** 等上游开源项目，以及为 MarkText 提供[赞助](https://github.com/sponsors/marktext)的个人与机构。
+
+本分支所做的，不过是在这座已经建得很完整的房子里加了两盏灯：粘贴时自动把公式定界符摆正，以及把 Office / PDF 文档请进门。**所有功劳归于原版作者与社区；本分支若有任何问题，责任在我们。**
+
+| | |
+| :--- | :--- |
+| 原版仓库 | <https://github.com/marktext/marktext> |
+| 官方网站 | <https://marktext.me> |
+| 用户文档 | <https://marktext.me/docs/introduction> |
+| 支持原版 | <https://github.com/sponsors/marktext> |
+
+如果 MarkText 让你的写作更顺手，请优先考虑支持原版项目。❤️
