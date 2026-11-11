@@ -18,6 +18,7 @@ import { getClipboardImageFile, getCopyTextType, isHttpUrl, isStandaloneTableHtm
 import { pasteClipboardImage, readClipboardImage } from './image';
 import { hasMarkdownSource } from './markdownSource';
 import { mergePasteIntoHeading } from './mergePasteIntoHeading';
+import { normalizeEscapedTex } from './normalizeTexDelimiters';
 import { insertImageSrc, replaceImageAt, resolveImageSrc } from './pasteImage';
 import { getUrlPaste, pasteUrl } from './pasteUrl';
 import { PasteType } from './types';
@@ -507,6 +508,9 @@ interface IPasteData {
     imageFile: File | null;
     pasteType: PasteType;
     internalImage?: IClipboardImage | null;
+    // The text slot was rewritten from doubly escaped TeX; the HTML copy still
+    // holds the raw delimiters and must not win.
+    escapedTex?: boolean;
 }
 
 function applyNormalizedPaste(
@@ -569,6 +573,10 @@ async function applyTextPaste(
     // Preserve source provenance before synthetic URL/table HTML promotion.
     const hasClipboardHtml = html !== '';
     if (text.length > 0 && hasMarkdownSource(html))
+        html = '';
+    // Escaped TeX is rewritten in the text slot only; keeping the HTML copy would
+    // paste the raw delimiters back over the normalized Markdown.
+    if (data.escapedTex)
         html = '';
 
     // Firefox can supply a pasted URL without HTML.
@@ -700,19 +708,23 @@ export function pasteSelection(
     if (!event.clipboardData)
         return Promise.resolve();
 
-    const text = rawText ?? event.clipboardData.getData('text/plain');
+    const pastedText = rawText ?? event.clipboardData.getData('text/plain');
+    const { text, converted } = normalizeEscapedTex(pastedText);
     const html = rawHtml ?? event.clipboardData.getData('text/html');
     const imageFile = getClipboardImageFile(event.clipboardData);
 
-    return applyPaste(clipboard, { text, html, imageFile, pasteType: clipboard.pasteType, internalImage: readClipboardImage(html, text) });
+    return applyPaste(clipboard, { text, html, imageFile, pasteType: clipboard.pasteType, internalImage: readClipboardImage(html, text), escapedTex: converted > 0 });
 }
 
 // Treat the supplied text as Markdown source without synthesizing rich HTML.
 export function pastePlainText(clipboard: Clipboard, text: string): Promise<void> {
+    const normalized = normalizeEscapedTex(text);
+
     return applyPaste(clipboard, {
-        text,
+        text: normalized.text,
         html: '',
         imageFile: null,
         pasteType: PasteType.PASTE_AS_PLAIN_TEXT,
+        escapedTex: normalized.converted > 0,
     });
 }
